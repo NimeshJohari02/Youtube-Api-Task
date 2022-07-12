@@ -2,16 +2,12 @@ const { Client } = require("@elastic/elasticsearch");
 const client = new Client({
   node: "http://localhost:9200",
 });
-
+const fs = require("fs");
 /*
 The bulk API makes it possible to perform many index/delete operations in a single API call. This can greatly increase the indexing speed.
  */
 const bulkInsert = async (data) => {
-  console.log("bulk insert: ", data);
-  client
-    .info()
-    .then((d) => console.trace(d.body))
-    .catch((e) => console.error(e));
+  //   console.log("bulk insert: ", data);
   await client.indices.create(
     {
       index: "videos",
@@ -32,27 +28,26 @@ const bulkInsert = async (data) => {
 
   const info = data.items
     .map((el) => {
-      if (el.id.kind == "youtube#video")
+      if (el.kind == "youtube#video")
         return {
-          id: el.id.videoId,
+          id: el.id,
           publishedAt: el.snippet.publishedAt,
           title: el.snippet.title,
           description: el.snippet.description,
           thumbnail: el.snippet.thumbnails.default.url,
         };
     }) // we need to remove the nulls, returned from map
-    .filter((video) => video);
-
+    .filter((data) => data);
+  //save info as json
   const body = info.flatMap((doc) => [{ index: { _index: "videos" } }, doc]);
-
-  const { body: bulkResponse } = await client.bulk({ refresh: true, body });
-
-  if (bulkResponse.errors) {
+  const res = await client.bulk({ refresh: true, body });
+  console.log(res);
+  if (!res.errors) {
+    const erroredDocuments = [];
     // The items array has the same order of the dataset we just indexed.
     // The presence of the `error` key indicates that the operation
     // that we did for the document has failed.
-    const erroredDocuments = [];
-    bulkResponse.items.forEach((action, i) => {
+    res.items.forEach((action, i) => {
       const operation = Object.keys(action)[0];
       if (action[operation].error) {
         erroredDocuments.push({
@@ -69,8 +64,8 @@ const bulkInsert = async (data) => {
     console.trace(erroredDocuments);
   }
 
-  const { body: count } = await client.count({ index: "videos" });
-  console.log("Insert Count: ", count);
+  const count = await client.count({ index: "videos" });
+  console.log("Insert Count: ", count.count);
 };
 
 // Search Using Elastic Search
