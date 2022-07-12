@@ -1,23 +1,13 @@
 const axios = require("axios");
 let idx = 0;
 const keyCollection = process.env.YT_KEY.split(",");
+const { request } = require("gaxios");
 const axiosHelper = require("../utils/axiosHelper");
 let apiKey = keyCollection[idx];
 const fetchInfo = async (lastTime) => {
   try {
     const response = await axiosHelper.get(
-      `https://www.googleapis.com/youtube/v3/search`,
-      {
-        params: {
-          part: "snippet",
-          type: "video",
-          maxResults: 50,
-          publishedAfter: lastTime,
-          order: "date",
-          q: "official",
-          apiKey,
-        },
-      }
+      `videos?part=snippet&chart=mostPopular&maxResults=50&regionCode=US&key=${apiKey}&publishedAfter=${lastTime}`
     );
     return [response.data, null];
   } catch (err) {
