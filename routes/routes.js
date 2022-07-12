@@ -24,4 +24,10 @@ router.get("/query", async (req, res) => {
   res.send({ hits, total });
 });
 
+router.get("/page", async (req, res) => {
+  // getPage
+  const res = await getPage(req.pageNumber, req.pageSize);
+  res.send(res);
+});
+
 module.exports = router;
