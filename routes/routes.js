@@ -14,12 +14,11 @@ router.get("/getInfo", async (req, res) => {
   //   console.log(data);
   //   get video title desc publishing date time and thumbnail
   res.send(data);
-  data["items"].forEach((element) => {
-    //Access Snippet data from element
-    const { publishedAt, title, description } = element.snippet;
-    const { url } = element.snippet.thumbnails.high;
-    console.log(url);
-  });
+  //   data["items"].forEach((element) => {
+  //Access Snippet data from element
+  //     const { publishedAt, title, description } = element.snippet;
+  //     const { url } = element.snippet.thumbnails.high;
+  //   });
   currTime = data.items[data.items.length - 1].snippet.publishedAt;
 });
 
