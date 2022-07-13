@@ -1,8 +1,8 @@
 const { search } = require("../utils/elasticHelper");
 const searchVideos = async (req, res) => {
-  const searchQuery = req.query.q;
-  const pageNumber = req.query.p;
-  const pageSize = req.query.s;
+  const searchQuery = req.q;
+  const pageNumber = req.p;
+  const pageSize = req.s;
 
   try {
     const { hits, total } = await search(searchQuery, pageNumber, pageSize);

@@ -2,7 +2,6 @@ const { Client } = require("@elastic/elasticsearch");
 const client = new Client({
   node: "http://localhost:9200",
 });
-const fs = require("fs");
 /*
 The bulk API makes it possible to perform many index/delete operations in a single API call. This can greatly increase the indexing speed.
  */
@@ -61,7 +60,7 @@ const bulkInsert = async (data) => {
         });
       }
     });
-    console.trace(erroredDocuments);
+    // console.trace(erroredDocuments);
   }
 
   const count = await client.count({ index: "videos" });
@@ -69,29 +68,36 @@ const bulkInsert = async (data) => {
 };
 
 // Search Using Elastic Search
+
 const search = async (query, pageNumber, pageSize) => {
-  const { body: response } = await client.search({
+  pageNumber = parseInt(pageNumber);
+  pageNumber = pageNumber || 0;
+
+  pageSize = parseInt(pageSize);
+  pageSize = pageSize || 10;
+
+  const result = await client.search({
     index: "videos",
-    from: (pageNumber - 1) * pageSize,
+    from: pageSize * (pageNumber - 1),
     size: pageSize,
+    sort: "publishedAt:desc",
     body: {
       query: {
-        match: {
-          title: query,
+        multi_match: {
+          query: query,
+          fields: ["title", "description"],
+          type: "best_fields",
         },
       },
     },
   });
-  return {
-    hits: response.hits.hits,
-    total: response.hits.total.value,
-    data: response.hits.hits.map((hit) => hit._source),
-  };
+  return result;
+  // return { hits: body.hits.hits, total: body.hits.total.value };
 };
 
 //
 const getPage = async (pageNumber, pageSize) => {
-  const { body: response } = await client.search({
+  const response = await client.search({
     index: "videos",
     from: (pageNumber - 1) * pageSize,
     size: pageSize,
@@ -101,11 +107,7 @@ const getPage = async (pageNumber, pageSize) => {
       },
     },
   });
-  return {
-    hits: response.hits.hits,
-    total: response.hits.total.value,
-    data: response.hits.hits.map((hit) => hit._source),
-  };
+  return { hits: response.hits.hits };
 };
 module.exports = {
   bulkInsert,
