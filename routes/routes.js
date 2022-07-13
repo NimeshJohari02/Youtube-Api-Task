@@ -13,8 +13,8 @@ router.get("/addInfo", async (req, res) => {
   if (err) {
     res.status(500).send(err);
   }
-  res.send(data);
   bulkInsert(data);
+  res.send(data);
 });
 router.get("/getAllInformationFromElastic", async (req, res) => {
   const data = await getPage(1, 10);

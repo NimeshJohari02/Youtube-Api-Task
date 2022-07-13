@@ -6,7 +6,7 @@ const client = new Client({
 The bulk API makes it possible to perform many index/delete operations in a single API call. This can greatly increase the indexing speed.
  */
 const bulkInsert = async (data) => {
-  //   console.log("bulk insert: ", data);
+  console.log("bulk insert: ", data);
   await client.indices.create(
     {
       index: "videos",
