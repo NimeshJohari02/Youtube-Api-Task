@@ -1,7 +1,6 @@
-const axios = require("axios");
+require("dotenv").config();
 let idx = 0;
 const keyCollection = process.env.YT_KEY.split(",");
-const { request } = require("gaxios");
 const axiosHelper = require("../utils/axiosHelper");
 let apiKey = keyCollection[idx];
 const fetchInfo = async (lastTime) => {
