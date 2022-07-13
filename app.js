@@ -5,7 +5,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const fetchRoutes = require("./routes/routes");
 const cron = require("node-cron");
+const { bulkInsert } = require("./utils/elasticHelper");
 app.use(express.json());
+
 app.use(require("cors")());
 const fetchInfo = require("./controller/fetchFromYt");
 /*
@@ -13,6 +15,8 @@ const fetchInfo = require("./controller/fetchFromYt");
 2 -> Database Add 
 3 -> Database Update
 4 -> Database Query
+5-> Kabana Try 
+6-> Dockerize 
 */
 //Configuring Node cron
 let occ = 0;
@@ -22,7 +26,7 @@ cron.schedule("*/10 * * * * *", async () => {
   const [res, err] = await fetchInfo(currTime);
   //   console.log(res);
   if (res) {
-    bulkInsert(res);
+    await bulkInsert(res);
     currTime = res.items[0].snippet.publishedAt;
   } else if (err) {
     console.log(err);
